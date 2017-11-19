@@ -8,18 +8,18 @@ import glob
 import os.path
 import pandas as pd
 import sys
-import operator
 from processor import process_image
 from keras.utils import np_utils
 
-class DataSet():
 
+class DataSet:
     def __init__(self, seq_length=40, class_limit=None, image_shape=(224, 224, 3)):
         """Constructor.
         seq_length = (int) the number of frames to consider
         class_limit = (int) number of classes to limit the data to.
             None = no limit.
         """
+
         self.seq_length = seq_length
         self.class_limit = class_limit
         self.sequence_path = './data/sequences/'
@@ -50,8 +50,7 @@ class DataSet():
         than N frames. Also limit it to classes we want to use."""
         data_clean = []
         for item in self.data:
-            if int(item[3]) >= self.seq_length and int(item[3]) <= self.max_frames \
-                    and item[1] in self.classes:
+            if self.seq_length <= int(item[3]) <= self.max_frames and item[1] in self.classes:
                 data_clean.append(item)
 
         return data_clean
@@ -121,8 +120,7 @@ class DataSet():
                 sequence = self.get_extracted_sequence(data_type, row)
 
                 if sequence is None:
-                    print("Can't find sequence. Did you generate them?")
-                    raise
+                    raise ValueError("Can't find sequence. Did you generate them?")
 
                 if concat:
                     # We want to pass the sequence back as a single array. This
@@ -191,7 +189,7 @@ class DataSet():
         """Get the saved extracted features."""
         filename = sample[2]
         path = self.sequence_path + filename + '-' + str(self.seq_length) + \
-            '-' + data_type + '.txt'
+               '-' + data_type + '.txt'
         if os.path.isfile(path):
             # Use a dataframe/read_csv for speed increase over numpy.
             features = pd.read_csv(path, sep=" ", header=None)
@@ -228,24 +226,3 @@ class DataSet():
 
         # Cut off the last one if needed.
         return output[:size]
-
-    @staticmethod
-    def print_class_from_prediction(predictions, nb_to_return=5):
-        """Given a prediction, print the top classes."""
-        # Get the prediction for each label.
-        label_predictions = {}
-        for i, label in enumerate(data.classes):
-            label_predictions[label] = predictions[i]
-
-        # Now sort them.
-        sorted_lps = sorted(
-            label_predictions.items(),
-            key=operator.itemgetter(1),
-            reverse=True
-        )
-
-        # And return the top N.
-        for i, class_prediction in enumerate(sorted_lps):
-            if i > nb_to_return - 1 or class_prediction[1] == 0.0:
-                break
-            print("%s: %.2f" % (class_prediction[0], class_prediction[1]))

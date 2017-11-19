@@ -7,6 +7,7 @@ Should only run this file once!
 import os
 import os.path
 
+
 def get_train_test_lists(version='01'):
     """
     Using one of the train/test files (01, 02, or 03), get the filename
@@ -17,13 +18,21 @@ def get_train_test_lists(version='01'):
     train_file = './ucfTrainTestlist/trainlist' + version + '.txt'
 
     # Build the test list.
-    with open(test_file) as fin:
-        test_list = [row.strip() for row in list(fin)]
+    with open(test_file) as f:
+        test_list = f.read().splitlines()
+        # test_list = [row.strip() for row in list(fin)]
+
+        """
+        FYI
+        In[1]: %timeit [row.strip() for row in list(fin)]
+        1000 loops, best of 3: 1.06 ms per loop
+        In[2]: %timeit f.read().splitlines()
+        1000 loops, best of 3: 502 µs per loop
+        """
 
     # Build the train list. Extra step to remove the class index.
-    with open(train_file) as fin:
-        train_list = [row.strip() for row in list(fin)]
-        train_list = [row.split(' ')[0] for row in train_list]
+    with open(train_file) as f:
+        train_list = [row.split(' ')[0] for row in f.read().splitlines()]
 
     # Set the groups in a dictionary.
     file_groups = {
@@ -32,6 +41,7 @@ def get_train_test_lists(version='01'):
     }
 
     return file_groups
+
 
 def move_files(file_groups):
     """This assumes all of our files are currently in _this_ directory.
@@ -56,7 +66,7 @@ def move_files(file_groups):
             # Check if we have already moved this file, or at least that it
             # exists to move.
             if not os.path.exists(filename):
-                print("Can't find %s to move. Skipping." % (filename))
+                print("Can't find %s to move. Skipping." % filename)
                 continue
 
             # Move it.
@@ -65,6 +75,7 @@ def move_files(file_groups):
             os.rename(filename, dest)
 
     print("Done.")
+
 
 def main():
     """
@@ -76,6 +87,7 @@ def main():
 
     # Move the files.
     move_files(group_lists)
+
 
 if __name__ == '__main__':
     main()

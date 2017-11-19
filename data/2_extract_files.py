@@ -9,6 +9,7 @@ import os
 import os.path
 from subprocess import call
 
+
 def extract_files():
     """After we have all of our videos split between train and test, and
     all nested within folders representing their classes, we need to
@@ -43,10 +44,8 @@ def extract_files():
                 # the info.
                 if not check_already_extracted(video_parts):
                     # Now extract it.
-                    src = train_or_test + '/' + classname + '/' + \
-                        filename
-                    dest = train_or_test + '/' + classname + '/' + \
-                        filename_no_ext + '-%04d.jpg'
+                    src = train_or_test + '/' + classname + '/' + filename
+                    dest = train_or_test + '/' + classname + '/' + filename_no_ext + '-%04d.jpg'
                     call(["ffmpeg", "-i", src, dest])
 
                 # Now get how many frames it is.
@@ -56,11 +55,12 @@ def extract_files():
 
                 print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
 
-    with open('data_file.csv', 'w') as fout:
-        writer = csv.writer(fout)
+    with open('data_file.csv', 'w') as f:
+        writer = csv.writer(f)
         writer.writerows(data_file)
 
     print("Extracted and wrote %d video files." % (len(data_file)))
+
 
 def get_nb_frames_for_video(video_parts):
     """Given video parts of an (assumed) already extracted video, return
@@ -69,6 +69,7 @@ def get_nb_frames_for_video(video_parts):
     generated_files = glob.glob(train_or_test + '/' + classname + '/' +
                                 filename_no_ext + '*.jpg')
     return len(generated_files)
+
 
 def get_video_parts(video_path):
     """Given a full path to a video, return its parts."""
@@ -80,11 +81,13 @@ def get_video_parts(video_path):
 
     return train_or_test, classname, filename_no_ext, filename
 
+
 def check_already_extracted(video_parts):
     """Check to see if we created the -0001 frame of this file."""
     train_or_test, classname, filename_no_ext, _ = video_parts
     return bool(os.path.exists(train_or_test + '/' + classname +
                                '/' + filename_no_ext + '-0001.jpg'))
+
 
 def main():
     """
@@ -94,6 +97,7 @@ def main():
     [train|test], class, filename, nb frames
     """
     extract_files()
+
 
 if __name__ == '__main__':
     main()
