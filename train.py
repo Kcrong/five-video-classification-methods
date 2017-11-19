@@ -69,7 +69,7 @@ def train(data_type, seq_length, model, saved_model=None,
             batch_size=batch_size,
             validation_data=(X_test, y_test),
             verbose=1,
-            callbacks=[tb, early_stopper, csv_logger],
+            callbacks=[tb, early_stopper, csv_logger, checkpointer],
             epochs=nb_epoch)
     else:
         # Use fit generator.
@@ -78,14 +78,17 @@ def train(data_type, seq_length, model, saved_model=None,
             steps_per_epoch=steps_per_epoch,
             epochs=nb_epoch,
             verbose=1,
-            callbacks=[tb, early_stopper, csv_logger],
+            callbacks=[tb, early_stopper, csv_logger, checkpointer],
             validation_data=val_generator,
             validation_steps=10)
+
+
+    rm.model.save('./model_final.hdf5')
 
 def main():
     """These are the main training settings. Set each before running
     this file."""
-    model = 'conv_3d'  # see `models.py` for more
+    model = 'lstm'  # see `models.py` for more
     saved_model = None  # None or weights file
     class_limit = 2  # int, can be 1-101 or None
     seq_length = 40
