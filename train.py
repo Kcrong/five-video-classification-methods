@@ -16,7 +16,7 @@ def train(data_type, seq_length, model, saved_model=None,
     # Helper: Save the model.
     checkpointer = ModelCheckpoint(
         filepath='./data/checkpoints/' + model + '-' + data_type + \
-            '.{epoch:03d}-{val_loss:.3f}.hdf5',
+            '.{epoch:03d}-{val_acc:.4f}.hdf5',
         verbose=1,
         save_best_only=True)
 
